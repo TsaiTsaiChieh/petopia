@@ -1,30 +1,35 @@
 package services
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-func ConnectDB() (*sql.DB, error) {
+func ConnectDB() (*gorm.DB, error) {
 	username := os.Getenv("username")
 	password := os.Getenv("password")
 	hostname := os.Getenv("hostname")
 	port := os.Getenv("port")
 	database := os.Getenv("database")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, hostname, port, database)
-	db, err := sql.Open("mysql", dsn)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, hostname, port, database)
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 
-	err = db.Ping()
+	sqlDB, err := db.DB()
 	if err != nil {
-		db.Close()
+		return nil, err
+	}
+	err = sqlDB.Ping()
+	if err != nil {
+		sqlDB.Close()
 		return nil, err
 	}
 

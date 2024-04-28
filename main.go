@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"petopia-server/models"
 	routes "petopia-server/router"
 	services "petopia-server/services"
 
@@ -18,7 +19,10 @@ func main() {
 	if err != nil {
 		log.Fatal("Error connecting to the database:", err)
 	}
-	defer db.Close()
+	err = db.AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatal("Error auto migrating tables:", err)
+	}
 	router := routes.NewRouter()
 	http.ListenAndServe(":3000", router)
 }
