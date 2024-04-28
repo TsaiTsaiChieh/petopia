@@ -19,7 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error connecting to the database:", err)
 	}
-	err = db.AutoMigrate(&models.User{})
+	err = db.AutoMigrate(&models.Animal{})
 	if err != nil {
 		log.Fatal("Error auto migrating tables:", err)
 	}
