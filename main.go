@@ -11,10 +11,19 @@ import (
 )
 
 func main() {
+	initializeEnvironment()
+	initDatabase()
+	startServer()
+}
+
+func initializeEnvironment() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func initDatabase() {
 	db, err := services.ConnectDB()
 	if err != nil {
 		log.Fatal("Error connecting to the database:", err)
@@ -23,6 +32,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Error auto migrating tables:", err)
 	}
+}
+
+func startServer() {
 	router := routes.NewRouter()
 	http.ListenAndServe(":3000", router)
 }
