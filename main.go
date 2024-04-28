@@ -1,18 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"petopia-server/models"
+	"petopia-server/jobs"
+	models "petopia-server/models"
 	routes "petopia-server/router"
 	services "petopia-server/services"
 
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron/v3"
 )
 
 func main() {
 	initializeEnvironment()
 	initDatabase()
+	scheduler()
 	startServer()
 }
 
@@ -37,4 +41,17 @@ func initDatabase() {
 func startServer() {
 	router := routes.NewRouter()
 	http.ListenAndServe(":3000", router)
+}
+
+func scheduler() {
+	c := cron.New()
+
+	c.AddFunc("@every 30s", func() {
+		fmt.Println("Every ten second")
+		jobs.DailyTask()
+	})
+	c.Start()
+
+	fmt.Println("Program has started. Waiting for scheduled tasks to execute...")
+
 }
